@@ -18,6 +18,7 @@ pub enum ParseMacAddressError {
 ///
 /// [RFC 9724]: https://datatracker.ietf.org/doc/rfc9724
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(transparent)]
 pub struct MacAddress {
     octets: [u8; 6],
 }
