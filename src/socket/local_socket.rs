@@ -11,7 +11,6 @@ use crate::socket::{Socket, SocketConnectError, SocketCreationError, SocketError
 #[derive(Debug)]
 pub struct LocalSocket {
     fd: OwnedFd,
-    path: Option<PathBuf>,
 }
 
 impl LocalSocket {
@@ -37,7 +36,7 @@ impl LocalSocket {
 
         let fd = unsafe { OwnedFd::from_raw_fd(raw_fd) };
 
-        Ok(Self { fd, path: None })
+        Ok(Self { fd })
     }
 }
 
