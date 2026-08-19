@@ -35,6 +35,18 @@ pub enum SocketReceiveError {
     General(#[from] std::io::Error),
 }
 
+/// Error type for the connection of a socket
+#[derive(Error, Debug)]
+pub enum SocketConnectError {
+    /// A General error
+    #[error("{0}")]
+    General(#[from] std::io::Error),
+
+    /// The socket's address is not valid unicode
+    #[error("Socket's address is not valid Unicode!")]
+    NotUnicode,
+}
+
 /// error type regarding the creation of Sockets
 #[derive(Error, Debug)]
 pub enum SocketCreationError {
@@ -51,6 +63,11 @@ pub enum SocketCreationError {
 
 /// Common trait shared between all Socket Types.
 pub trait Socket: AsFd {
+    type Address;
+
+    /// Connect to the type of Address to initiate packet sharing
+    fn connect(&self, address: &Self::Address) -> Result<(), SocketConnectError>;
+
     /// Send octets using the socket.
     fn send(&self, buf: &[u8]) -> Result<usize, SocketSendError> {
         let res = unsafe {
