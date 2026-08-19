@@ -1,4 +1,7 @@
-use std::{fmt::Display, str::FromStr};
+use std::{
+    fmt::{Display, LowerHex, UpperHex},
+    str::FromStr,
+};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -74,6 +77,20 @@ impl Display for MacAddress {
             "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
             a, b, c, d, e, g
         )
+    }
+}
+
+impl LowerHex for MacAddress {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let [a, b, c, d, e, g] = self.octets;
+        write!(f, "{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}", a, b, c, d, e, g)
+    }
+}
+
+impl UpperHex for MacAddress {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let [a, b, c, d, e, g] = self.octets;
+        write!(f, "{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}", a, b, c, d, e, g)
     }
 }
 
