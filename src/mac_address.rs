@@ -15,6 +15,12 @@ pub struct MacAddress {
     octets: [u8; 6],
 }
 
+impl From<[u8; 6]> for MacAddress {
+    fn from(value: [u8; 6]) -> Self {
+        MacAddress::new(value)
+    }
+}
+
 impl MacAddress {
     pub const BROADCAST: Self = Self::new([0xFF; 6]);
     pub const ZERO: Self = Self::new([0x00; 6]);
