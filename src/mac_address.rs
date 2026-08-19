@@ -50,11 +50,11 @@ impl MacAddress {
 
 impl Display for MacAddress {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let octets = &self.octets;
+        let [a, b, c, d, e, g] = self.octets;
         write!(
             f,
-            "{}:{}:{}:{}:{}:{}",
-            octets[0], octets[1], octets[2], octets[3], octets[4], octets[5]
+            "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
+            a, b, c, d, e, g
         )
     }
 }
