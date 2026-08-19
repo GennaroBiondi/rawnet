@@ -1,6 +1,6 @@
+use crate::socket::{ArpSocket, LocalSocket};
 use std::io;
-use std::os::fd::{AsFd, AsRawFd, BorrowedFd, FromRawFd, OwnedFd};
-use std::path::PathBuf;
+use std::os::fd::{AsFd, AsRawFd};
 use thiserror::Error;
 
 /// A general error type for Sockets.
@@ -49,7 +49,9 @@ pub enum SocketCreationError {
     NoPermission,
 }
 
+/// Common trait shared between all Socket Types.
 pub trait Socket: AsFd {
+    /// Send octets using the socket.
     fn send(&self, buf: &[u8]) -> Result<usize, SocketSendError> {
         let res = unsafe {
             libc::send(
@@ -69,6 +71,7 @@ pub trait Socket: AsFd {
         }
     }
 
+    /// Receive octets using the socket.
     fn receive(&self, buf: &mut [u8]) -> Result<usize, SocketReceiveError> {
         let res = unsafe {
             libc::recv(
@@ -89,66 +92,14 @@ pub trait Socket: AsFd {
     }
 }
 
-#[derive(Debug)]
-pub struct ArpSocket {
-    fd: OwnedFd,
-}
-
-impl AsFd for ArpSocket {
-    fn as_fd(&self) -> BorrowedFd<'_> {
-        self.fd.as_fd()
-    }
-}
-
-/// Struct for working with UNIX Sockets (also called local sockets)
-///
-/// a Local Socket is useful when working with IPC.
-#[derive(Debug)]
-pub struct LocalSocket {
-    fd: OwnedFd,
-    path: Option<PathBuf>,
-}
-
-impl LocalSocket {
-    /// Construct a new LocalSocket.
-    pub fn new() -> Result<Self, SocketError> {
-        let raw_fd = unsafe {
-            use libc::{AF_LOCAL, SOCK_STREAM, socket};
-
-            let fd = socket(AF_LOCAL, SOCK_STREAM, 0);
-
-            if fd < 0 {
-                use io::{Error, ErrorKind};
-
-                let error = Error::last_os_error();
-                let error_kind = error.kind();
-
-                match error_kind {
-                    ErrorKind::PermissionDenied => Err(SocketCreationError::NoPermission),
-                    _ => Err(SocketCreationError::General(error)),
-                }
-            } else {
-                Ok(fd)
-            }
-        }?;
-
-        let fd = unsafe { OwnedFd::from_raw_fd(raw_fd) };
-
-        Ok(Self { fd, path: None })
-    }
-}
-
-impl AsFd for LocalSocket {
-    fn as_fd(&self) -> BorrowedFd<'_> {
-        self.fd.as_fd()
-    }
-}
-
-impl Socket for ArpSocket {}
-
 /// A Generalization of a Socket.
+///
+/// if working with sockets in OSI Layer 4, see [`std::net`]
 #[derive(Debug)]
 pub enum SocketKind {
+    /// ARP Socket.
     Arp(ArpSocket),
+
+    /// Local Socket
     Local(LocalSocket),
 }
