@@ -1,8 +1,9 @@
+use std::ffi::c_char;
 use std::io::{Error, ErrorKind};
-use std::os::fd::{AsFd, BorrowedFd, FromRawFd};
+use std::os::fd::{AsFd, AsRawFd, BorrowedFd, FromRawFd};
 use std::{os::fd::OwnedFd, path::PathBuf};
 
-use crate::socket::{SocketCreationError, SocketError};
+use crate::socket::{Socket, SocketConnectError, SocketCreationError, SocketError};
 
 /// Struct for working with UNIX Sockets (also called local sockets)
 ///
@@ -37,6 +38,40 @@ impl LocalSocket {
         let fd = unsafe { OwnedFd::from_raw_fd(raw_fd) };
 
         Ok(Self { fd, path: None })
+    }
+}
+
+impl Socket for LocalSocket {
+    type Address = PathBuf;
+
+    fn connect(&self, address: &Self::Address) -> Result<(), SocketConnectError> {
+        use libc::{AF_UNIX, connect, sockaddr_un};
+        use std::mem::size_of;
+
+        let path = address.to_str().ok_or(SocketConnectError::NotUnicode)?;
+        let path_bytes = path.as_bytes();
+
+        let mut sock_addr: sockaddr_un = unsafe { std::mem::zeroed() };
+        sock_addr.sun_family = AF_UNIX as _;
+
+        for (i, &byte) in path_bytes.iter().enumerate().take(107) {
+            sock_addr.sun_path[i] = byte as c_char;
+        }
+        sock_addr.sun_path[path_bytes.len()] = 0;
+
+        let res = unsafe {
+            connect(
+                self.fd.as_raw_fd(),
+                &sock_addr as *const _ as *const _,
+                size_of::<sockaddr_un>() as _,
+            )
+        };
+
+        if res < 0 {
+            Err(SocketConnectError::General(Error::last_os_error()))
+        } else {
+            Ok(())
+        }
     }
 }
 
