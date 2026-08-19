@@ -1,4 +1,14 @@
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum ParseMacAddressError {
+    #[error("Input doesn't have exactly 6 octets")]
+    InvalidLength,
+
+    #[error("Input octets are invalid")]
+    InvalidOctet,
+}
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct MacAddress {
@@ -58,5 +68,27 @@ impl Display for MacAddress {
             "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
             a, b, c, d, e, g
         )
+    }
+}
+
+impl FromStr for MacAddress {
+    type Err = ParseMacAddressError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let octets: Vec<&str> = s.split(':').collect();
+        let octets_amount = octets.len();
+
+        if octets_amount != 6 {
+            return Err(ParseMacAddressError::InvalidLength);
+        }
+
+        let mut num_octets: [u8; 6] = [0; 6];
+
+        for (i, hex_oct) in octets.iter().enumerate() {
+            num_octets[i] =
+                u8::from_str_radix(hex_oct, 16).map_err(|_| ParseMacAddressError::InvalidOctet)?
+        }
+
+        Ok(MacAddress { octets: num_octets })
     }
 }
