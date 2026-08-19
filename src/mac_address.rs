@@ -23,27 +23,29 @@ impl MacAddress {
         self.octets
     }
 
-    pub fn is_broadcast(&self) -> bool {
-        self.octets() == Self::BROADCAST.octets()
+    pub const fn is_broadcast(&self) -> bool {
+        let [a, b, c, d, e, f] = self.octets;
+        a == 0xFF && b == 0xFF && c == 0xFF && d == 0xFF && e == 0xFF && f == 0xFF
     }
 
-    pub fn is_zero(&self) -> bool {
-        self.octets() == Self::ZERO.octets()
+    pub const fn is_zero(&self) -> bool {
+        let [a, b, c, d, e, f] = self.octets;
+        a == 0 && b == 0 && c == 0 && d == 0 && e == 0 && f == 0
     }
 
-    pub fn is_multicast(&self) -> bool {
+    pub const fn is_multicast(&self) -> bool {
         (self.octets[0] & 0x01) != 0
     }
 
-    pub fn is_unicast(&self) -> bool {
+    pub const fn is_unicast(&self) -> bool {
         !self.is_multicast()
     }
 
-    pub fn is_local(&self) -> bool {
+    pub const fn is_local(&self) -> bool {
         (self.octets[0] & 0x02) != 0
     }
 
-    pub fn is_universal(&self) -> bool {
+    pub const fn is_universal(&self) -> bool {
         !self.is_local()
     }
 }
