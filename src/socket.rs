@@ -1,27 +1,36 @@
 use std::io;
 use std::os::fd::{AsFd, AsRawFd, BorrowedFd, FromRawFd, OwnedFd};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use thiserror::Error;
 
-/// a general error type for Sockets.
+/// A general error type for Sockets.
 #[derive(Error, Debug)]
 pub enum SocketError {
+    /// Failed creating a Socket
     #[error("Failed to create socket: {0}")]
-    SocketCreation(#[from] SocketCreationError),
+    Creation(#[from] SocketCreationError),
+
+    /// Failed to send data using a Socket
     #[error("Failed to send data using socket: {0}")]
-    SocketSend(#[from] SocketSendError),
+    Send(#[from] SocketSendError),
+
+    /// Failed to receive data using a Socket
     #[error("Failed to receive data using socket: {0}")]
-    SocketReceive(#[from] SocketReceiveError),
+    Receive(#[from] SocketReceiveError),
 }
 
+/// Error type for sending data using a socket
 #[derive(Error, Debug)]
 pub enum SocketSendError {
+    /// A General error
     #[error("{0}")]
     General(#[from] std::io::Error),
 }
 
+/// Error type for receiving data using a socket
 #[derive(Error, Debug)]
 pub enum SocketReceiveError {
+    /// A General error
     #[error("{0}")]
     General(#[from] std::io::Error),
 }
@@ -29,9 +38,13 @@ pub enum SocketReceiveError {
 /// error type regarding the creation of Sockets
 #[derive(Error, Debug)]
 pub enum SocketCreationError {
+    /// A General error
     #[error("{0}")]
     General(#[from] std::io::Error),
 
+    /// Failed creating a socket, caused by not having enough permissions
+    ///
+    /// usually this happens when creating an ARP socket.
     #[error("Not enough permissions")]
     NoPermission,
 }
@@ -87,6 +100,9 @@ impl AsFd for ArpSocket {
     }
 }
 
+/// Struct for working with UNIX Sockets (also called local sockets)
+///
+/// a Local Socket is useful when working with IPC.
 #[derive(Debug)]
 pub struct LocalSocket {
     fd: OwnedFd,
@@ -94,6 +110,7 @@ pub struct LocalSocket {
 }
 
 impl LocalSocket {
+    /// Construct a new LocalSocket.
     pub fn new() -> Result<Self, SocketError> {
         let raw_fd = unsafe {
             use libc::{AF_LOCAL, SOCK_STREAM, socket};
@@ -119,14 +136,6 @@ impl LocalSocket {
 
         Ok(Self { fd, path: None })
     }
-
-    pub fn set_path(&mut self, path: PathBuf) {
-        self.path = Some(path);
-    }
-
-    pub fn get_path(&self) -> Option<&Path> {
-        self.path.as_deref()
-    }
 }
 
 impl AsFd for LocalSocket {
@@ -137,7 +146,9 @@ impl AsFd for LocalSocket {
 
 impl Socket for ArpSocket {}
 
+/// A Generalization of a Socket.
 #[derive(Debug)]
-pub enum RawSocket {
+pub enum SocketKind {
     Arp(ArpSocket),
+    Local(LocalSocket),
 }
