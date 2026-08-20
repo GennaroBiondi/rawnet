@@ -2,6 +2,12 @@
 name = "rawnet"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+description = "Rust crate to easily work with raw sockets and packets"
+repository = "https://github.com/GennaroBiondi/rawnet"
+readme = "README.md"
+keywords = ["packet", "networking", "arp", "mac-address", "raw-socket"]
+categories = ["network-programming"]
 
 [dependencies]
 libc = "0.2.189"
