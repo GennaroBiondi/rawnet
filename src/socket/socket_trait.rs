@@ -45,6 +45,10 @@ pub enum SocketConnectError {
     /// The socket's address is not valid unicode
     #[error("Socket's address is not valid Unicode!")]
     NotUnicode,
+
+    /// The socket's address is too long
+    #[error("Socket's address is too long!")]
+    TooLong,
 }
 
 /// error type regarding the creation of Sockets
@@ -120,3 +124,28 @@ pub enum SocketKind {
     /// Local Socket
     Local(LocalSocket),
 }
+
+impl AsFd for SocketKind {
+    fn as_fd(&self) -> std::os::unix::prelude::BorrowedFd<'_> {
+        match self {
+            Self::Local(x) => x.as_fd(),
+            Self::Arp(x) => x.as_fd(),
+        }
+    }
+}
+
+// impl Socket for SocketKind {
+//     fn send(&self, buf: &[u8]) -> Result<usize, SocketSendError> {
+//         match self {
+//             Self::Local(x) => x.send(buf),
+//             Self::Arp(x) => x.send(buf),
+//         }
+//     }
+//
+//     fn receive(&self, buf: &mut [u8]) -> Result<usize, SocketReceiveError> {
+//         match self {
+//             Self::Local(x) => x.receive(buf),
+//             Self::Arp(x) => x.receive(buf),
+//         }
+//     }
+// }
