@@ -53,12 +53,12 @@ impl ArpSocket {
 /// # Examples
 ///
 /// ```no_run
-/// use rawnet::{MacAddress, socket::{ArpSocket, Socket}};
+/// use rawnet::{MacAddress, socket::{ArpSocket, ArpHeader, Socket}};
 /// use std::net::Ipv4Addr;
 ///
 /// let arp_socket = ArpSocket::new().unwrap();
 /// let arp_header = ArpHeader::request(MacAddress::ZERO, Ipv4Addr::LOCALHOST, Ipv4Addr::UNSPECIFIED);
-/// let arp_packet = (&arp_header).into();
+/// let arp_packet: Vec<u8> = (&arp_header).into();
 /// arp_socket.send(&arp_packet).unwrap();
 /// ```
 #[derive(Debug)]
