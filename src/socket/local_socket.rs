@@ -53,9 +53,14 @@ impl Socket for LocalSocket {
         let mut sock_addr: sockaddr_un = unsafe { std::mem::zeroed() };
         sock_addr.sun_family = AF_UNIX as _;
 
-        for (i, &byte) in path_bytes.iter().enumerate().take(107) {
+        if path_bytes.len() > 107 {
+            return Err(SocketConnectError::TooLong);
+        }
+
+        for (i, &byte) in path_bytes.iter().enumerate() {
             sock_addr.sun_path[i] = byte as c_char;
         }
+
         sock_addr.sun_path[path_bytes.len()] = 0;
 
         let res = unsafe {
