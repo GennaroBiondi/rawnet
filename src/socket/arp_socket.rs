@@ -9,13 +9,13 @@ use crate::{
     socket::{Socket, SocketConnectError},
 };
 
-/// Struct for working with the ARP Protocol
+/// Struct for working with the ARP Protocol.
 #[derive(Debug)]
 pub struct ArpSocket {
     fd: OwnedFd,
 }
 
-/// Struct to easily build arp requests
+/// Struct to easily build ARP requests.
 #[derive(Debug)]
 #[repr(C, packed)]
 pub struct ArpHeader {

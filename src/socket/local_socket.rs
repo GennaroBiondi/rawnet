@@ -5,9 +5,9 @@ use std::{os::fd::OwnedFd, path::PathBuf};
 
 use crate::socket::{Socket, SocketConnectError, SocketCreationError, SocketError};
 
-/// Struct for working with UNIX Sockets (also called local sockets)
+/// Struct for working with UNIX Sockets (also called local sockets).
 ///
-/// a Local Socket is useful when working with IPC.
+/// A Local Socket is useful when working with IPC.
 #[derive(Debug)]
 pub struct LocalSocket {
     fd: OwnedFd,

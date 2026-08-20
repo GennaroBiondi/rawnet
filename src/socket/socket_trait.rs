@@ -51,7 +51,7 @@ pub enum SocketConnectError {
     TooLong,
 }
 
-/// error type regarding the creation of Sockets
+/// Error type regarding the creation of Sockets.
 #[derive(Error, Debug)]
 pub enum SocketCreationError {
     /// A General error
@@ -67,10 +67,10 @@ pub enum SocketCreationError {
 
 /// Common trait shared between all Socket Types.
 pub trait Socket: AsFd {
-    /// the type of the Address. Commonly an IP.
+    /// The type of the Address.
     type Address;
 
-    /// Connect to the type of Address to initiate packet sharing
+    /// Connect to the given address to initiate packet sharing.
     fn connect(&self, address: &Self::Address) -> Result<(), SocketConnectError>;
 
     /// Send octets using the socket.
@@ -116,13 +116,13 @@ pub trait Socket: AsFd {
 
 /// A Generalization of a Socket.
 ///
-/// if working with sockets in OSI Layer 4, see [`std::net`]
+/// If working with sockets in OSI Layer 4, see [`std::net`].
 #[derive(Debug)]
 pub enum SocketKind {
     /// ARP Socket.
     Arp(ArpSocket),
 
-    /// Local Socket
+    /// Local Socket.
     Local(LocalSocket),
 }
 

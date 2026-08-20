@@ -14,9 +14,7 @@ pub enum ParseMacAddressError {
     InvalidOctet,
 }
 
-/// a struct to work with MAC Addresses.
-///
-/// [RFC 9724]: https://datatracker.ietf.org/doc/rfc9724
+/// A struct to work with MAC Addresses.
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
 pub struct MacAddress {
@@ -30,10 +28,10 @@ impl From<[u8; 6]> for MacAddress {
 }
 
 impl MacAddress {
-    /// a Broadcast MAC Address.
+    /// A Broadcast MAC Address.
     pub const BROADCAST: Self = Self::new([0xFF; 6]);
 
-    /// a MAC Address with all octets being 0.
+    /// A MAC Address with all octets being 0.
     pub const ZERO: Self = Self::new([0x00; 6]);
 
     /// Construct a new MAC Address given an array of six octets.
@@ -71,12 +69,12 @@ impl MacAddress {
         !self.is_multicast()
     }
 
-    /// Check if the MAC Address is local
+    /// Check if the MAC Address is local.
     pub const fn is_local(&self) -> bool {
         (self.octets[0] & 0x02) != 0
     }
 
-    /// Check if the MAC Address is not local
+    /// Check if the MAC Address is universal.
     pub const fn is_universal(&self) -> bool {
         !self.is_local()
     }
