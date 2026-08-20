@@ -67,6 +67,7 @@ pub enum SocketCreationError {
 
 /// Common trait shared between all Socket Types.
 pub trait Socket: AsFd {
+    /// the type of the Address. Commonly an IP.
     type Address;
 
     /// Connect to the type of Address to initiate packet sharing
