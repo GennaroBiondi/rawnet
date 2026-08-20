@@ -182,6 +182,14 @@ impl ArpHeader {
             target_ip: target_ip.octets(),
         }
     }
+
+    pub const fn is_request(&self) -> bool {
+        self.operation == 1
+    }
+
+    pub const fn is_reply(&self) -> bool {
+        self.operation == 2
+    }
 }
 
 impl AsFd for ArpSocket {
