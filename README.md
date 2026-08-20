@@ -1,5 +1,9 @@
 # rawnet
 
+[![Crates.io](https://img.shields.io/crates/v/rawnet.svg)](https://crates.io/crates/rawnet)
+[![Documentation](https://docs.rs/rawnet/badge.svg)](https://docs.rs/rawnet)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Simple to use crate to easily work with Raw Sockets and Packets.
 
 ## Overview
