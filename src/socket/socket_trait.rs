@@ -3,22 +3,6 @@ use std::io;
 use std::os::fd::{AsFd, AsRawFd};
 use thiserror::Error;
 
-/// A general error type for Sockets.
-#[derive(Error, Debug)]
-pub enum SocketError {
-    /// Failed creating a Socket
-    #[error("Failed to create socket: {0}")]
-    Creation(#[from] SocketCreationError),
-
-    /// Failed to send data using a Socket
-    #[error("Failed to send data using socket: {0}")]
-    Send(#[from] SocketSendError),
-
-    /// Failed to receive data using a Socket
-    #[error("Failed to receive data using socket: {0}")]
-    Receive(#[from] SocketReceiveError),
-}
-
 /// Error type for sending data using a socket
 #[derive(Error, Debug)]
 pub enum SocketSendError {
