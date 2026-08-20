@@ -9,10 +9,10 @@ It includes a `Socket` trait for a unified interface across socket types, plus a
 
 ## Features
 
-- **`Socket` trait** -- common interface for `send`, `receive`, and `connect` across socket types
-- **`ArpSocket`** -- AF_PACKET socket for sending and receiving ARP packets (layer 2/3)
-- **`LocalSocket`** -- AF_LOCAL socket for Unix domain IPC (layer 4)
-- **`MacAddress`** -- 6-byte MAC address type with parsing, formatting, and classification (broadcast, multicast, unicast, local/universal)
+- **`trait Socket`**: common interface for `send`, `receive`, and `connect` across socket types
+- **`struct ArpSocket`**: AF_PACKET socket for sending and receiving ARP packets (layer 2/3)
+- **`struct LocalSocket`**: AF_LOCAL socket for Unix domain IPC (layer 4)
+- **`struct MacAddress`**: 6-byte MAC address type with parsing, formatting, and classification (broadcast, multicast, unicast, local/universal)
 
 ## Installation
 
