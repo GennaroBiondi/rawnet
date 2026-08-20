@@ -111,20 +111,17 @@ impl FromStr for MacAddress {
     type Err = ParseMacAddressError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let octets: Vec<&str> = s.split(':').collect();
-        let octets_amount = octets.len();
-
-        if octets_amount != 6 {
-            return Err(ParseMacAddressError::InvalidLength(octets_amount));
-        }
-
-        let mut num_octets: [u8; 6] = [0; 6];
-
-        for (i, hex_oct) in octets.iter().enumerate() {
+        let mut num_octets = [0u8; 6];
+        for (i, hex_oct) in s.split(':').enumerate() {
+            if i >= 6 {
+                return Err(ParseMacAddressError::InvalidLength(i + 1));
+            }
             num_octets[i] =
-                u8::from_str_radix(hex_oct, 16).map_err(|_| ParseMacAddressError::InvalidOctet)?
+                u8::from_str_radix(hex_oct, 16).map_err(|_| ParseMacAddressError::InvalidOctet)?;
         }
-
+        if s.split(':').count() != 6 {
+            return Err(ParseMacAddressError::InvalidLength(s.split(':').count()));
+        }
         Ok(MacAddress { octets: num_octets })
     }
 }
