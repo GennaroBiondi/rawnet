@@ -3,7 +3,7 @@ use std::io::{Error, ErrorKind};
 use std::os::fd::{AsFd, AsRawFd, BorrowedFd, FromRawFd};
 use std::{os::fd::OwnedFd, path::PathBuf};
 
-use crate::socket::{Socket, SocketConnectError, SocketCreationError, SocketError};
+use crate::socket::{Socket, SocketConnectError, SocketCreationError};
 
 /// Struct for working with UNIX Sockets (also called local sockets).
 ///
@@ -15,7 +15,7 @@ pub struct LocalSocket {
 
 impl LocalSocket {
     /// Construct a new LocalSocket.
-    pub fn new() -> Result<Self, SocketError> {
+    pub fn new() -> Result<Self, SocketCreationError> {
         let raw_fd = unsafe {
             use libc::{AF_LOCAL, SOCK_STREAM, socket};
 
