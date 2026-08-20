@@ -18,7 +18,7 @@ pub struct ArpSocket {
 /// Struct to easily build arp requests
 #[derive(Debug)]
 #[repr(C, packed)]
-struct ArpHeader {
+pub struct ArpHeader {
     pub hardware_type: u16,
     pub protocol_type: u16,
     pub hw_addr_len: u8,
@@ -47,7 +47,7 @@ impl Default for ArpHeader {
 }
 
 impl ArpHeader {
-    fn as_packet(&self) -> Vec<u8> {
+    pub fn as_packet(&self) -> Vec<u8> {
         unsafe {
             std::slice::from_raw_parts(
                 self as *const ArpHeader as *const u8,
@@ -78,7 +78,7 @@ impl Socket for ArpSocket {
         sock_addr.sll_family = AF_PACKET as _;
 
         for (i, &byte) in path_bytes.iter().enumerate() {
-            sock_addr.sll_addr[i] = byte as u8;
+            sock_addr.sll_addr[i] = byte;
         }
 
         let res = unsafe {
