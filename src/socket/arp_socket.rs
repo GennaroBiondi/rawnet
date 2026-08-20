@@ -77,7 +77,7 @@ impl Socket for ArpSocket {
         let mut sock_addr: sockaddr_ll = unsafe { std::mem::zeroed() };
         sock_addr.sll_family = AF_PACKET as _;
 
-        for (i, &byte) in path_bytes.iter().enumerate().take(107) {
+        for (i, &byte) in path_bytes.iter().enumerate() {
             sock_addr.sll_addr[i] = byte as u8;
         }
 
