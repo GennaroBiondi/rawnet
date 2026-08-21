@@ -27,6 +27,47 @@ impl Interface {
     pub fn as_str(&self) -> &str {
         &self.0
     }
+
+    /// Get all IPs from this device.
+    pub fn get_all_device_ipv4s() -> Vec<std::net::Ipv4Addr> {
+        use libc::{AF_INET, freeifaddrs, getifaddrs};
+        use std::{net::Ipv4Addr, ptr};
+
+        let mut result = Vec::new();
+
+        unsafe {
+            let mut ifaddrs = ptr::null_mut();
+
+            if getifaddrs(&mut ifaddrs) != 0 {
+                return result;
+            }
+
+            let mut current = ifaddrs;
+
+            while !current.is_null() {
+                let addr = (*current).ifa_addr;
+
+                if !addr.is_null() && (*addr).sa_family as i32 == AF_INET {
+                    let sockaddr = addr as *const libc::sockaddr_in;
+
+                    let ip = Ipv4Addr::from(u32::from_be((*sockaddr).sin_addr.s_addr));
+
+                    if !ip.is_loopback() {
+                        result.push(ip);
+                    }
+                }
+
+                current = (*current).ifa_next;
+            }
+
+            freeifaddrs(ifaddrs);
+        }
+
+        result.sort();
+        result.dedup();
+
+        result
+    }
 }
 
 impl Display for Interface {
