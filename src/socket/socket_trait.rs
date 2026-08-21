@@ -3,6 +3,14 @@ use std::io;
 use std::os::fd::{AsFd, AsRawFd};
 use thiserror::Error;
 
+/// Error type for general socket operations
+#[derive(Error, Debug)]
+pub enum SocketError {
+    /// A General error
+    #[error("{0}")]
+    General(#[from] std::io::Error),
+}
+
 /// Error type for sending data using a socket
 #[derive(Error, Debug)]
 pub enum SocketSendError {
