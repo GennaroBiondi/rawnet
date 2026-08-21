@@ -1,6 +1,5 @@
 use std::{
     io::{Error, ErrorKind},
-    net::Ipv4Addr,
     os::fd::{AsFd, AsRawFd, BorrowedFd, FromRawFd, OwnedFd},
 };
 
@@ -45,35 +44,8 @@ impl EthernetSocket {
     }
 }
 
-impl Socket for EthernetSocket {
-    type Address = EthernetAddress;
-
-    fn connect(&self, address: &Self::Address) -> Result<(), SocketConnectError> {
-        use libc::{AF_PACKET, connect, sockaddr_ll};
-        use std::mem::size_of;
-
-        let path = address;
-        let path_bytes = path.octets();
-
-        let mut sock_addr: sockaddr_ll = unsafe { std::mem::zeroed() };
-        sock_addr.sll_family = AF_PACKET as _;
-
-        for (i, &byte) in path_bytes.iter().enumerate() {
-            sock_addr.sll_addr[i] = byte;
-        }
-
-        let res = unsafe {
-            connect(
-                self.fd.as_raw_fd(),
-                &sock_addr as *const _ as *const _,
-                size_of::<sockaddr_ll>() as _,
-            )
-        };
-
-        if res < 0 {
-            Err(SocketConnectError::General(Error::last_os_error()))
-        } else {
-            Ok(())
-        }
+impl AsFd for EthernetSocket {
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        self.fd.as_fd()
     }
 }
