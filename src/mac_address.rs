@@ -7,10 +7,10 @@ use thiserror::Error;
 /// The error type for Parsing Mac Addresses.
 #[derive(Error, Debug)]
 pub enum ParseMacAddressError {
-    #[error("Input has {0} octets instead of 6")]
+    #[error("MAC Address has {0} octets instead of 6")]
     InvalidLength(usize),
 
-    #[error("Input octets are invalid")]
+    #[error("MAC Address octets are invalid")]
     InvalidOctet,
 }
 
