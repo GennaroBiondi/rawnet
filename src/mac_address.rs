@@ -41,8 +41,8 @@ impl MacAddress {
 
     /// Get all the MAC Addresses of all interfaces on this device.
     ///
-    /// This may include virtual MAC Addresses. as distinguishing a virtual or physical
-    /// MAC Address isn't possible
+    // This may include MAC addresses belonging to virtual interfaces,
+    // as a MAC address alone does not indicate whether its interface is physical or virtual.
     pub fn get_all_device_macs() -> Vec<Self> {
         use libc::{AF_PACKET, freeifaddrs, getifaddrs};
         use std::ptr;
@@ -77,6 +77,67 @@ impl MacAddress {
                         if !mac.is_zero() {
                             result.push(mac);
                         }
+                    }
+                }
+
+                current = (*current).ifa_next;
+            }
+
+            freeifaddrs(ifaddrs);
+        }
+
+        result.sort();
+        result.dedup();
+
+        result
+    }
+
+    /// Filter through all the MAC Addresses of all interfaces on this device.
+    ///
+    /// The closure should return true if the MacAddress should be kept
+    ///
+    // This may include MAC addresses belonging to virtual interfaces,
+    // as a MAC address alone does not indicate whether its interface is physical or virtual.
+    pub fn get_all_device_macs_filter<F: FnMut(&MacAddress) -> bool>(mut filter_f: F) -> Vec<Self> {
+        use libc::{AF_PACKET, freeifaddrs, getifaddrs};
+        use std::ptr;
+
+        let mut result = Vec::new();
+
+        unsafe {
+            let mut ifaddrs = ptr::null_mut();
+
+            if getifaddrs(&mut ifaddrs) != 0 {
+                return result;
+            }
+
+            let mut current = ifaddrs;
+
+            while !current.is_null() {
+                let addr = (*current).ifa_addr;
+
+                if !addr.is_null() && (*addr).sa_family as i32 == AF_PACKET {
+                    let sll = addr as *const libc::sockaddr_ll;
+
+                    if (*sll).sll_halen == 6 {
+                        let mac = Self::new([
+                            (*sll).sll_addr[0] as u8,
+                            (*sll).sll_addr[1] as u8,
+                            (*sll).sll_addr[2] as u8,
+                            (*sll).sll_addr[3] as u8,
+                            (*sll).sll_addr[4] as u8,
+                            (*sll).sll_addr[5] as u8,
+                        ]);
+
+                        if mac.is_zero() {
+                            continue;
+                        }
+
+                        if !filter_f(&mac) {
+                            continue;
+                        }
+
+                        result.push(mac);
                     }
                 }
 
