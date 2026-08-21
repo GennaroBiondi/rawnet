@@ -1,4 +1,4 @@
-use crate::MacAddress;
+use crate::{MacAddress, packet::Packet};
 use std::net::Ipv4Addr;
 use thiserror::Error;
 
@@ -274,6 +274,14 @@ impl TryFrom<&[u8]> for ArpPacket {
     }
 }
 
+impl TryFrom<Vec<u8>> for ArpPacket {
+    type Error = ArpPacketConvertError;
+
+    fn try_from(value: Vec<u8>) -> Result<Self, Self::Error> {
+        value.as_slice().try_into()
+    }
+}
+
 impl ArpPacket {
     /// Construct an ArpPacket by only providing the sender's MacAddress, IP, and the target's IP.
     ///
@@ -324,5 +332,11 @@ impl ArpPacket {
     /// Checks if the ArpPacket is a reply (op code 2)
     pub const fn is_reply(&self) -> bool {
         matches!(self.operation, ArpOperationCode::Reply)
+    }
+}
+
+impl Packet for ArpPacket {
+    fn ether_type(&self) -> u16 {
+        0x0806
     }
 }
