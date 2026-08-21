@@ -7,6 +7,7 @@ pub mod packet;
 /// Module for working with Sockets in OSI layer 2 and 3.
 pub mod socket;
 
+pub use ethernet_address::{EthernetAddress, Interface, ParseInterfaceError};
 pub use mac_address::MacAddress;
 
 #[cfg(test)]
